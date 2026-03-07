@@ -39,6 +39,10 @@ if refresh_clicked:
 else:
     df = load_data()
 
+if DATA_PATH.exists():
+    updated_at = pd.Timestamp(DATA_PATH.stat().st_mtime, unit="s").strftime("%Y-%m-%d %H:%M:%S")
+    st.caption(f"Local snapshot: `{DATA_PATH}` (updated {updated_at})")
+
 if df.empty:
     st.info("No local data yet. Click **Refresh monthly totals now** to fetch the latest counts.")
     st.stop()

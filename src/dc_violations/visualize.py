@@ -11,6 +11,8 @@ def build_monthly_totals(df: pd.DataFrame) -> pd.DataFrame:
         grouped = (
             df[["source_year", "source_month_num", "violations"]]
             .copy()
+            .groupby(["source_year", "source_month_num"], dropna=False, as_index=False)["violations"]
+            .sum()
             .sort_values(["source_year", "source_month_num"])
         )
     else:

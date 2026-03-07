@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "15 10 * * *"
 
+concurrency:
+  group: refresh-dc-violations
+  cancel-in-progress: true
+
 jobs:
   refresh:
     runs-on: ubuntu-latest

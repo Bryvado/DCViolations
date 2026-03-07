@@ -26,6 +26,8 @@ Refresh monthly summary (default):
 python scripts/update_data.py --years 2025 --months 0 1 --output data/violations_monthly_latest.parquet
 ```
 
+`--months` accepts ArcGIS layer IDs `0..11` and now validates invalid values early.
+
 Full raw pull (heavy; may consume significant memory):
 
 ```bash

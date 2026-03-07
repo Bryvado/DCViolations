@@ -41,6 +41,17 @@ class FetchConfig:
     max_workers: int = 2
 
 
+def normalize_month_ids(month_ids: Iterable[int] | None) -> list[int]:
+    if month_ids is None:
+        return list(MONTHS.keys())
+
+    normalized = sorted(set(month_ids))
+    invalid = [month_id for month_id in normalized if month_id not in MONTHS]
+    if invalid:
+        raise ValueError(f"Invalid month layer IDs: {invalid}. Expected values in 0..11")
+    return normalized
+
+
 def arcgis_get(url: str, params: dict, timeout: int = 120, max_retries: int = 5) -> dict:
     """Retry wrapper for ArcGIS REST requests."""
     last_err = None
@@ -178,8 +189,9 @@ def fetch_year_parallel(
         raise KeyError(f"No ArcGIS service configured for year={year}")
 
     frames = []
-    selected_months = list(month_ids) if month_ids is not None else list(MONTHS.keys())
-    with ThreadPoolExecutor(max_workers=config.max_workers) as executor:
+    selected_months = normalize_month_ids(month_ids)
+    max_workers = max(1, min(config.max_workers, len(selected_months)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         if summary_only:
             futures = {
                 executor.submit(fetch_month_summary, year, month_id, config, where): month_id
