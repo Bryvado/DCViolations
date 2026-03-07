@@ -1,0 +1,26 @@
+name: Refresh DC violations data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 10 * * *"
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+      - name: Pull latest monthly summary
+        run: python scripts/update_data.py --output data/violations_monthly_latest.parquet
+      - name: Upload parquet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: violations-monthly-latest
+          path: data/violations_monthly_latest.parquet
